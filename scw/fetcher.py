@@ -4,6 +4,7 @@ import urllib2 as ur
 from urllib2 import HTTPError
 import traceback
 
+
 class Fetcher(threading.Thread):
 	def __init__(self, app, url):
 		super(Fetcher, self).__init__()

@@ -1,6 +1,7 @@
 import sys
 
-class App():
+
+class App:
 	def __init__(self):
 		self.exit_flag = False
 		self.IGNORE_EXIT_FLAG = True
@@ -21,4 +22,3 @@ class App():
 		
 	def deltaSeconds(self, delta):
 		return float(delta.seconds) + float(delta.microseconds) / 1000000
-	
