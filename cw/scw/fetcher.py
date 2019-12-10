@@ -1,35 +1,27 @@
-from datetime import datetime
 import threading
-from urllib import request as ur
+import time
 from urllib.error import HTTPError
-import traceback
+from urllib.request import Request, urlopen
+
 
 class Fetcher(threading.Thread):
-	def __init__(self, app, url):
+	def __init__(self, url, i):
 		super(Fetcher, self).__init__()
-		self.app = app
 		self.url = url
+		self.num = i
 		self.load_time = 0.0
 		self.code = None
 
 	def run(self):
+		p_start = time.time()
+		hdr = {'User-Agent': 'Mozilla/5.0'}
+		req = Request(self.url, headers=hdr)
 		try:
-			try: 
-				p_start = datetime.now()
-				res = self.app.urlopen(self.url)
-				p_end = datetime.now()
-				p_delta = p_end - p_start
-				self.code = res.getcode()
-			except HTTPError as http_error:
-				p_end = datetime.now()
-				p_delta = p_end - p_start
-				self.code = http_error.code
-			self.load_time = self.app.deltaSeconds(p_delta)
-		except KeyboardInterrupt as e:
-			self.app.setExitFlag(True)
-			self.app.printflush( 'KeyboardInterrupt' + traceback.format_exc())
-		except Exception as e:
-			self.app.printflush( traceback.format_exc())
-			
-	def printStatus(self):
-		self.app.printflush( str(format(self.load_time, '.3f')) + ' ' + str(self.code) + ' ' + self.url)
+			res = urlopen(req)
+			p_end = time.time()
+			self.code = res.getcode()
+		except HTTPError as http_error:
+			p_end = time.time()
+			self.code = http_error.code
+		self.load_time = p_end - p_start
+		print(self.num, str(format(self.load_time, '.3f')) + ' ' + str(self.code) + ' ' + self.url)
