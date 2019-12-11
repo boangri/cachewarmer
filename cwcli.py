@@ -1,12 +1,9 @@
-#!/usr/bin/python3
 import os
-__path__=[os.path.dirname(os.path.abspath(__file__))]
-
-from .cw.CacheWarmer import CacheWarmer
+from cw.CacheWarmer import CacheWarmer
 import sys
 import getopt
 
-
+#__path__=[os.path.dirname(os.path.abspath(__file__))]
 def main(argv):
     sitemap_url = ''
     threads_count = 100
