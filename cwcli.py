@@ -10,11 +10,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hs:n:", ["sitemap=", "number"])
     except getopt.GetoptError:
-        printHelp()
+        print_help()
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            printHelp()
+            print_help()
             sys.exit()
         if opt in ("-s", "--sitemap"):
             sitemap_url = arg.strip("'\"")
@@ -25,7 +25,7 @@ def main(argv):
         cw.start()
 
 
-def printHelp():
+def print_help():
     file = os.path.basename(__file__)
     print(file + ' -s|--sitemap <url|file> [-n|--number <frequency, Hz>]')
 
