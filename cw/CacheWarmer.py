@@ -60,12 +60,20 @@ class CacheWarmer:
         Fetch an URLs list from website XML sitemap
         """
         try:
-            f = self.urlopen(self.sitemap_url)
-            res = f.readlines()
-            for d in res:
-                data = re.findall('<loc>(https?:\/\/.+?)<\/loc>', d.decode("utf-8"))
-                for i in data:
-                    self.urls.append(i)
+            if self.sitemap_url.startswith('http'):
+                f = self.urlopen(self.sitemap_url)
+                res = f.readlines()
+                for d in res:
+                    data = re.findall('<loc>(https?:\/\/.+?)<\/loc>', d.decode("utf-8"))
+                    for url in data:
+                        self.urls.append(url)
+            else:  # sitemap is a file
+                f = open(self.sitemap_url, 'r')
+                res = f.readlines()
+                for d in res:
+                    data = re.findall('<loc>(https?:\/\/.+?)<\/loc>', d)
+                    for url in data:
+                        self.urls.append(url)
         except Exception as e:
             self.printflush(str(e))
             self.printflush(traceback.format_exc())
@@ -79,7 +87,6 @@ class CacheWarmer:
         try:
             for url in self.urls:
                 i += 1
-                # thread = Fetcher(url, i)
                 thread = threading.Thread(target=self.fetcher, args=(url, i))
                 self.delay()
                 thread.start()
