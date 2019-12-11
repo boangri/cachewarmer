@@ -63,14 +63,14 @@ class CacheWarmer:
                 f = self.urlopen(self.sitemap_url)
                 res = f.readlines()
                 for d in res:
-                    data = re.findall('<loc>(https?:\/\/.+?)<\/loc>', d.decode("utf-8"))
+                    data = re.findall('<loc>(https?://.+?)</loc>', d.decode("utf-8"))
                     for url in data:
                         self.urls.append(url)
             else:  # sitemap is a file
                 f = open(self.sitemap_url, 'r')
                 res = f.readlines()
                 for d in res:
-                    data = re.findall('<loc>(https?:\/\/.+?)<\/loc>', d)
+                    data = re.findall('<loc>(https?://.+?)</loc>', d)
                     for url in data:
                         self.urls.append(url)
         except Exception as e:
