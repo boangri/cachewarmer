@@ -10,8 +10,7 @@ from urllib.request import Request, urlopen
 
 
 class CacheWarmer:
-    def __init__(self, sitemap, processes=100, frequency=1.0):
-        self.processes = processes
+    def __init__(self, sitemap, frequency=1.0):
         self.active_threads = []
         self.urls = []
         self.updated_count = 0
@@ -19,6 +18,7 @@ class CacheWarmer:
         self.sitemap_url = sitemap
         self.code_statistics = {}
         self.average_time = 0.0
+        self.dispersion = 0.0
         self.tau = 1.0 / frequency
         self.last_start = 0.0
         self.code = None
@@ -33,7 +33,6 @@ class CacheWarmer:
         self.printflush('Sitemap: ' + self.sitemap_url)
         self.getUrlsList()
         self.printflush('Fetched: ' + str(self.fetched_count))
-        self.printflush('Processes: ' + str(self.processes))
         self.CheckURLs()
         self.printReport()
 
@@ -50,9 +49,9 @@ class CacheWarmer:
         Print a report after process execution
         """
         self.printflush('Fetched: ' + str(self.fetched_count), self.IGNORE_EXIT_FLAG)
-        self.printflush('Processes: ' + str(self.processes), self.IGNORE_EXIT_FLAG)
         self.printflush('Updated: ' + str(self.updated_count), self.IGNORE_EXIT_FLAG)
-        self.printflush('Average page load time: ' + format(self.average_time, '.3f'), self.IGNORE_EXIT_FLAG)
+        self.printflush('Average page load time, sec: ' + format(self.average_time, '.3f'), self.IGNORE_EXIT_FLAG)
+        self.printflush('Standard deviation time, sec: ' + format(self.dispersion, '.3f'), self.IGNORE_EXIT_FLAG)
         self.printflush('Returned with code: ' + repr(self.code_statistics), self.IGNORE_EXIT_FLAG)
 
     def getUrlsList(self):
@@ -97,6 +96,8 @@ class CacheWarmer:
             thread.join()
         if self.updated_count > 1:
             self.average_time /= self.updated_count
+            self.dispersion /= self.updated_count
+        self.dispersion = pow(self.dispersion - self.average_time * self.average_time, 0.5)
 
     def delay(self):
         """
@@ -124,6 +125,7 @@ class CacheWarmer:
         load_time = p_end - p_start
         print(i, str(format(load_time, '.3f')) + ' ' + str(code) + ' ' + url)
         self.average_time += load_time
+        self.dispersion += load_time*load_time
         self.updated_count += 1
         if code not in self.code_statistics:
             self.code_statistics[code] = 1
